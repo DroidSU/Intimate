@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "445313705216",
+    "firebase_url": "https://intimate-1721a.firebaseio.com",
+    "project_id": "intimate-1721a",
+    "storage_bucket": "intimate-1721a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445313705216:android:f2c00f9ac315df27",
+        "android_client_info": {
+          "package_name": "com.morningstar.intimate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445313705216-dgo1f2o0tr6tjitfrh48716q04t1k585.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.morningstar.intimate",
+            "certificate_hash": "2947f5d9622030e2f9329b999a68936781fcdaa4"
+          }
+        },
+        {
+          "client_id": "445313705216-jmneo6n3dg43btcellbde7co8edq9jkf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGpaPoJk2kBqRyJ5Z4PDiAWsbET3XO1_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445313705216-jmneo6n3dg43btcellbde7co8edq9jkf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
