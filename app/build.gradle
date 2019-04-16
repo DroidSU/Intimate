@@ -20,9 +20,9 @@ android {
         }
         debug {
             debuggable true
-//            minifyEnabled true
-//            shrinkResources true
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            shrinkResources false
+            useProguard false
         }
     }
     compileOptions {

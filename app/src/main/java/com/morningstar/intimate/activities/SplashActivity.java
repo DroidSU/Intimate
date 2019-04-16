@@ -9,10 +9,12 @@
 package com.morningstar.intimate.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.managers.ConstantManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,8 +29,22 @@ public class SplashActivity extends AppCompatActivity {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                finish();
+                SharedPreferences sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+                boolean isAuth = sharedPreferences.getBoolean(ConstantManager.IS_AUTHENTICATED, false);
+                boolean isPinSet = sharedPreferences.getBoolean(ConstantManager.IS_PIN_SET, false);
+                boolean isBioSet = sharedPreferences.getBoolean(ConstantManager.IS_BIOMETRIC_SET, false);
+                if (isAuth) {
+                    if (isPinSet || isBioSet) {
+                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(SplashActivity.this, UserAuthenticationActivity.class));
+                        finish();
+                    }
+                } else {
+                    startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                    finish();
+                }
             }
         };
         handler.postDelayed(runnable, 100);

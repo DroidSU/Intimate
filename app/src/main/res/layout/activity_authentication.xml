@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Created by Sujoy Datta. Copyright (c) 2019. All rights reserved.
   ~
   ~ To the person who is reading this..
@@ -7,10 +6,10 @@
   ~ P.S.: In case you are planning to use this without mentioning me, you will be met with mean judgemental looks and sarcastic comments.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:startColor="@color/colorPrimaryLight"
-        android:centerColor="@color/colorPrimary"
-        android:endColor="@color/colorPrimaryDark" />
-    <corners android:radius="8dp" />
-</shape>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.AuthenticationActivity">
+
+</LinearLayout>

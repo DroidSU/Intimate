@@ -25,4 +25,8 @@
 #Proguard rule for firebase model classes
 -keep class com.google.firebase.example.fireeats.java.model.** { *; }
 -keep class com.google.firebase.** { *; }
+-keep class com.firebase.** { *; }
+-keepnames class com.fasterxml.jackson.** { *; }
+-keepnames class javax.servlet.** { *; }
+-keepnames class org.ietf.jgss.** { *; }
 

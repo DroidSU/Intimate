@@ -8,16 +8,34 @@
 
 package com.morningstar.intimate.activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.managers.ConstantManager;
+import com.morningstar.intimate.managers.UtilityManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -29,6 +47,18 @@ public class LoginActivity extends AppCompatActivity {
     Button buttonLogin;
     @BindView(R.id.textViewRegister)
     TextView textViewRegister;
+    @BindView(R.id.loginProgressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.loginActivityRoot)
+    LinearLayout linearLayout;
+    @BindView(R.id.loginRootLayout)
+    LinearLayout rootLayout;
+
+    private String emailAddress;
+    private String password;
+    private FirebaseAuth firebaseAuth;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +66,135 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+    }
 
+    @OnClick(R.id.buttonLogin)
+    public void login() {
+        progressBar.setVisibility(View.VISIBLE);
+        buttonLogin.setEnabled(false);
+        emailAddress = editTextLoginEmail.getText().toString();
+        password = editTextLoginPassword.getText().toString();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if (!TextUtils.isEmpty(emailAddress) && validateEmail(emailAddress) && !TextUtils.isEmpty(password) && validatePassword(password)) {
+            if (UtilityManager.isOnline()) {
+                firebaseAuth.signInWithEmailAndPassword(emailAddress, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    editor = sharedPreferences.edit();
+                                    editor.putString(ConstantManager.USER_EMAIL, emailAddress);
+                                    editor.putBoolean(ConstantManager.IS_AUTHENTICATED, true);
+                                    editor.apply();
+                                    progressBar.setVisibility(View.GONE);
+
+                                    Intent intent = new Intent(LoginActivity.this, UserAuthenticationActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Snackbar.make(rootLayout, "Wrong user credentials", Snackbar.LENGTH_SHORT);
+                                    Toast.makeText(LoginActivity.this, "Wrong user credentials", Toast.LENGTH_SHORT).show();
+                                    progressBar.setVisibility(View.GONE);
+                                    buttonLogin.setEnabled(true);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                buttonLogin.setEnabled(true);
+                                Snackbar.make(rootLayout, "An error occurred", Snackbar.LENGTH_SHORT);
+                            }
+                        });
+            } else {
+                Toast.makeText(this, "Not Online", Toast.LENGTH_SHORT).show();
+                Snackbar.make(rootLayout, "Not Online", Snackbar.LENGTH_SHORT);
+            }
+        } else {
+            if (TextUtils.isEmpty(emailAddress))
+                editTextLoginEmail.setError("Empty email");
+            if (!validateEmail(emailAddress))
+                editTextLoginEmail.setError("Invalid email format");
+            if (TextUtils.isEmpty(password))
+                editTextLoginPassword.setError("Empty password");
+            if (validatePassword(password))
+                editTextLoginPassword.setError("Please choose 6 digit password");
+
+            buttonLogin.setEnabled(true);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick(R.id.textViewRegister)
+    public void registerUser() {
+        progressBar.setVisibility(View.VISIBLE);
+        textViewRegister.setEnabled(false);
+        emailAddress = editTextLoginEmail.getText().toString();
+        password = editTextLoginPassword.getText().toString();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if (!TextUtils.isEmpty(emailAddress) && validateEmail(emailAddress) && !TextUtils.isEmpty(password) && validatePassword(password)) {
+            if (UtilityManager.isOnline()) {
+                firebaseAuth.createUserWithEmailAndPassword(emailAddress, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    editor = sharedPreferences.edit();
+                                    editor.putString(ConstantManager.USER_EMAIL, emailAddress);
+                                    editor.putBoolean(ConstantManager.IS_AUTHENTICATED, true);
+                                    editor.apply();
+                                    progressBar.setVisibility(View.GONE);
+
+                                    Intent intent = new Intent(LoginActivity.this, UserAuthenticationActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(LoginActivity.this, "User could not be created", Toast.LENGTH_SHORT).show();
+                                    progressBar.setVisibility(View.GONE);
+                                    textViewRegister.setEnabled(true);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                textViewRegister.setEnabled(true);
+                                progressBar.setVisibility(View.GONE);
+                                Snackbar.make(rootLayout, "An error occurred", Snackbar.LENGTH_SHORT);
+                            }
+                        });
+            } else {
+                Toast.makeText(this, "Not Online", Toast.LENGTH_SHORT).show();
+                Snackbar.make(rootLayout, "Not Online", Snackbar.LENGTH_SHORT);
+            }
+        } else {
+            if (TextUtils.isEmpty(emailAddress))
+                editTextLoginEmail.setError("Empty email");
+            if (!validateEmail(emailAddress))
+                editTextLoginEmail.setError("Invalid email format");
+            if (TextUtils.isEmpty(password))
+                editTextLoginPassword.setError("Empty password");
+            if (validatePassword(password))
+                editTextLoginPassword.setError("Please choose 6 digit password");
+
+            textViewRegister.setEnabled(true);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean validateEmail(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean validatePassword(String pass) {
+        if (pass.length() > 6)
+            return true;
+        else
+            return false;
     }
 }

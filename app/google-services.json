@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "445313705216-ism5uihjlue7ctdfhm1hftuvhmslqkl1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.morningstar.intimate",
+            "certificate_hash": "6bd61fc92f38f00ca7c6b9538c32ea1e32f9c198"
+          }
+        },
+        {
           "client_id": "445313705216-jmneo6n3dg43btcellbde7co8edq9jkf.apps.googleusercontent.com",
           "client_type": 3
         }
