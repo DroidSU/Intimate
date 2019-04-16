@@ -18,23 +18,33 @@ import android.content.pm.PackageManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
 import android.os.CancellationSignal;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.morningstar.intimate.activities.MainActivity;
+
+import java.security.KeyStore;
+
+import javax.crypto.KeyGenerator;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 public class BiometricManager {
 
+    private static final String TAG = "BiometricManager";
+
     private static CancellationSignal cancellationSignal;
     private static BiometricPrompt.AuthenticationCallback authenticationCallback;
     private static BiometricPrompt biometricPrompt;
+    private static KeyGenerator keyGenerator;
 
     public static BiometricPrompt getBiometricPrompt(Context context) {
         if (BiometricManager.isSdkVersionSupportedForFingerprint() && BiometricManager.isHardwareSupportedForFingerprint(context)
                 && BiometricManager.isFingerPrintPermissionGranted(context)) {
-            if (BiometricManager.isBiometricPromptEnabled()) {
+            if (BiometricManager.isBiometricPromptEnabled()) {          // biometric prompt is not enabled for devices below pie
                 if (BiometricManager.isFingerprintAvailable(context)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         biometricPrompt = new BiometricPrompt.Builder(context)
@@ -48,13 +58,15 @@ public class BiometricManager {
                                 })
                                 .build();
                     }
+                } else {
+                    Toast.makeText(context, "No fingerprint available. Please set a fingerprint.", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(context, "Not possible", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Feature not available", Toast.LENGTH_SHORT).show();
                 biometricPrompt = null;
             }
         } else {
-            Toast.makeText(context, "Not possible", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Feature not available", Toast.LENGTH_SHORT).show();
             biometricPrompt = null;
         }
 
@@ -143,5 +155,25 @@ public class BiometricManager {
                     PackageManager.PERMISSION_GRANTED;
         } else
             return false;
+    }
+
+    private void generateKeyForKeyStore() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+                keyGenerator.init(new KeyGenParameterSpec.Builder(ConstantManager.FINGERPRINT_KEY,
+                        KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                        .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                        .setUserAuthenticationRequired(true)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                        .build());
+
+                keyGenerator.generateKey();
+            }
+        } catch (Exception e) {
+            Log.i(TAG, e.getMessage());
+        }
     }
 }

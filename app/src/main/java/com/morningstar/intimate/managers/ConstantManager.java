@@ -14,4 +14,5 @@ public class ConstantManager {
     public static final String IS_AUTHENTICATED = "isAuthenticated";
     public static final String IS_PIN_SET = "isPinSet";
     public static final String IS_BIOMETRIC_SET = "isBiometricSet";
+    public static final String FINGERPRINT_KEY = "FingerprintKey";
 }
