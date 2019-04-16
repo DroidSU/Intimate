@@ -12,23 +12,14 @@ import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.managers.BiometricManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class UserAuthenticationActivity extends AppCompatActivity {
-
-    @BindView(R.id.setUpFingerprint)
-    TextView textViewSetFingerprint;
-    @BindView(R.id.setUpPinCode)
-    TextView textViewSetPin;
+public class CheckAuthStateActivity extends AppCompatActivity {
 
     private CancellationSignal cancellationSignal;
     private BiometricPrompt.AuthenticationCallback authenticationCallback;
@@ -37,22 +28,16 @@ public class UserAuthenticationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_authentication);
-        ButterKnife.bind(this);
-    }
+        setContentView(R.layout.activity_check_auth);
 
-
-    @OnClick(R.id.setUpFingerprint)
-    public void setUpFingerprint() {
         biometricPrompt = BiometricManager.getBiometricPrompt(this);
-
         if (biometricPrompt != null) {
             if (BiometricManager.getAuthenticationCallback(this) != null) {
                 cancellationSignal = BiometricManager.getCancellationSignal();
                 cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() {
                     @Override
                     public void onCancel() {
-                        Toast.makeText(UserAuthenticationActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CheckAuthStateActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
                     }
                 });
                 authenticationCallback = BiometricManager.getAuthenticationCallback(this);
@@ -61,10 +46,5 @@ public class UserAuthenticationActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    @OnClick(R.id.setUpPinCode)
-    public void setUpPinCode() {
-
     }
 }

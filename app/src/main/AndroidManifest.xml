@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.AuthenticationActivity"></activity>
+        <activity android:name=".activities.CheckAuthStateActivity"></activity>
         <activity android:name=".activities.UserAuthenticationActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.SplashActivity">

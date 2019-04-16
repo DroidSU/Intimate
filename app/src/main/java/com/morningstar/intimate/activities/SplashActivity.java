@@ -35,8 +35,13 @@ public class SplashActivity extends AppCompatActivity {
                 boolean isBioSet = sharedPreferences.getBoolean(ConstantManager.IS_BIOMETRIC_SET, false);
                 if (isAuth) {
                     if (isPinSet || isBioSet) {
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                        finish();
+                        if (isBioSet) {
+                            startActivity(new Intent(SplashActivity.this, CheckAuthStateActivity.class));
+                            finish();
+                        } else {
+                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                            finish();
+                        }
                     } else {
                         startActivity(new Intent(SplashActivity.this, UserAuthenticationActivity.class));
                         finish();
