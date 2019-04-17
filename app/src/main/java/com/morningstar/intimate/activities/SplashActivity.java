@@ -36,7 +36,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (isAuth) {
                     if (isPinSet || isBioSet) {
                         if (isBioSet) {
-                            startActivity(new Intent(SplashActivity.this, CheckAuthStateActivity.class));
+                            startActivity(new Intent(SplashActivity.this, FingerprintAuthActivity.class));
                             finish();
                         } else {
                             startActivity(new Intent(SplashActivity.this, MainActivity.class));

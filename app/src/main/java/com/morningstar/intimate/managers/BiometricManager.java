@@ -44,7 +44,7 @@ public class BiometricManager {
     public static BiometricPrompt getBiometricPrompt(Context context) {
         if (BiometricManager.isSdkVersionSupportedForFingerprint() && BiometricManager.isHardwareSupportedForFingerprint(context)
                 && BiometricManager.isFingerPrintPermissionGranted(context)) {
-            if (BiometricManager.isBiometricPromptEnabled()) {          // biometric prompt is not enabled for devices below pie
+            if (BiometricManager.isBiometricPromptEnabled()) {         // biometric prompt is not enabled for devices below pie
                 if (BiometricManager.isFingerprintAvailable(context)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         biometricPrompt = new BiometricPrompt.Builder(context)
@@ -62,7 +62,6 @@ public class BiometricManager {
                     Toast.makeText(context, "No fingerprint available. Please set a fingerprint.", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(context, "Feature not available", Toast.LENGTH_SHORT).show();
                 biometricPrompt = null;
             }
         } else {

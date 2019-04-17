@@ -51,4 +51,6 @@ dependencies {
     //ButterKnife
     implementation 'com.jakewharton:butterknife:10.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    //Expanded floating action button
+    implementation 'com.github.BrotherV:Floating-ArcMenu:1.1.0.2'
 }

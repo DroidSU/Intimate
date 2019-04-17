@@ -19,7 +19,6 @@ import android.os.CancellationSignal;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.morningstar.intimate.R;
@@ -36,18 +35,10 @@ import javax.crypto.SecretKey;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class UserAuthenticationActivity extends AppCompatActivity {
+public class FingerprintAuthActivity extends AppCompatActivity {
 
-    private static final String TAG = "UserAuthActivity";
-
-    @BindView(R.id.setUpFingerprint)
-    TextView textViewSetFingerprint;
-    @BindView(R.id.setUpPinCode)
-    TextView textViewSetPin;
+    private static final String TAG = "CheckAuthState";
 
     private CancellationSignal cancellationSignal;
     private BiometricPrompt.AuthenticationCallback authenticationCallback;
@@ -55,26 +46,20 @@ public class UserAuthenticationActivity extends AppCompatActivity {
     private KeyStore keyStore;
     private Cipher cipher;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_authentication);
-        ButterKnife.bind(this);
-    }
+        setContentView(R.layout.activity_fingerprint_auth);
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @OnClick(R.id.setUpFingerprint)
-    public void setUpFingerprint() {
         biometricPrompt = BiometricManager.getBiometricPrompt(this);
-
         if (biometricPrompt != null) {
             if (BiometricManager.getAuthenticationCallback(this) != null) {
                 cancellationSignal = BiometricManager.getCancellationSignal();
                 cancellationSignal.setOnCancelListener(new CancellationSignal.OnCancelListener() {
                     @Override
                     public void onCancel() {
-                        Toast.makeText(UserAuthenticationActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FingerprintAuthActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
                     }
                 });
                 authenticationCallback = BiometricManager.getAuthenticationCallback(this);
@@ -85,11 +70,6 @@ public class UserAuthenticationActivity extends AppCompatActivity {
         } else {
             showDialogWhenPromptDisabled();
         }
-    }
-
-    @OnClick(R.id.setUpPinCode)
-    public void setUpPinCode() {
-        Toast.makeText(this, "Why!", Toast.LENGTH_SHORT).show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
