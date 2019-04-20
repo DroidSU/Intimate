@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 28
@@ -40,8 +41,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:16.1.0'
     implementation 'com.google.firebase:firebase-core:16.0.8'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
+    androidTestImplementation 'androidx.test:runner:1.2.0-alpha04'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'
     //circle imageView
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     //mike penz drawer
@@ -53,4 +54,8 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
     //Expanded floating action button
     implementation 'com.github.BrotherV:Floating-ArcMenu:1.1.0.2'
+    //TedBottomPicker
+    implementation 'gun0912.ted:tedbottompicker:2.0.0-alpha1'
+    //TedPermissions
+    implementation 'gun0912.ted:tedpermission:2.2.2'
 }

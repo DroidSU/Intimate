@@ -19,7 +19,12 @@ import android.os.CancellationSignal;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.helpers.FingerprintHandler;
@@ -32,9 +37,9 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class FingerprintAuthActivity extends AppCompatActivity {
 
@@ -46,12 +51,27 @@ public class FingerprintAuthActivity extends AppCompatActivity {
     private KeyStore keyStore;
     private Cipher cipher;
 
+    @BindView(R.id.startAuthButton)
+    ImageView imageViewStartAuth;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fingerprint_auth);
+        ButterKnife.bind(this);
 
+        startAuth();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @OnClick(R.id.startAuthButton)
+    public void authInitiated() {
+        startAuth();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startAuth() {
         biometricPrompt = BiometricManager.getBiometricPrompt(this);
         if (biometricPrompt != null) {
             if (BiometricManager.getAuthenticationCallback(this) != null) {

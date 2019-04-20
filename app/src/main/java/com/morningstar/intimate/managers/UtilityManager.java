@@ -9,6 +9,7 @@
 package com.morningstar.intimate.managers;
 
 import android.content.Context;
+import android.net.Uri;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -33,5 +34,13 @@ public class UtilityManager {
 
     public static void notifyUser(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static String convertUriToString(Uri uri) {
+        return uri.toString();
+    }
+
+    public static Uri convertStringToUri(String string) {
+        return Uri.parse(string);
     }
 }

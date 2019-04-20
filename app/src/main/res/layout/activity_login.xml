@@ -67,16 +67,15 @@
             android:textColor="@color/md_black_1000"
             android:textSize="16sp" />
 
-
-        <TextView
-            android:id="@+id/textViewRegister"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/buttonRegister"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:gravity="center"
-            android:text="@string/create_new_account"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="18sp"
-            android:textStyle="bold|italic" />
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/rounded_rectangle_bg_2"
+            android:text="Register"
+            android:textColor="@color/md_black_1000"
+            android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

@@ -18,8 +18,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,8 +33,6 @@ import com.morningstar.intimate.R;
 import com.morningstar.intimate.managers.ConstantManager;
 import com.morningstar.intimate.managers.UtilityManager;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -45,8 +45,8 @@ public class LoginActivity extends AppCompatActivity {
     EditText editTextLoginPassword;
     @BindView(R.id.buttonLogin)
     Button buttonLogin;
-    @BindView(R.id.textViewRegister)
-    TextView textViewRegister;
+    @BindView(R.id.buttonRegister)
+    Button buttonRegister;
     @BindView(R.id.loginProgressBar)
     ProgressBar progressBar;
     @BindView(R.id.loginActivityRoot)
@@ -128,10 +128,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.textViewRegister)
+    @OnClick(R.id.buttonRegister)
     public void registerUser() {
         progressBar.setVisibility(View.VISIBLE);
-        textViewRegister.setEnabled(false);
+        buttonRegister.setEnabled(false);
         emailAddress = editTextLoginEmail.getText().toString();
         password = editTextLoginPassword.getText().toString();
 
@@ -156,14 +156,14 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     Toast.makeText(LoginActivity.this, "User could not be created", Toast.LENGTH_SHORT).show();
                                     progressBar.setVisibility(View.GONE);
-                                    textViewRegister.setEnabled(true);
+                                    buttonRegister.setEnabled(true);
                                 }
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                textViewRegister.setEnabled(true);
+                                buttonRegister.setEnabled(true);
                                 progressBar.setVisibility(View.GONE);
                                 Snackbar.make(rootLayout, "An error occurred", Snackbar.LENGTH_SHORT);
                             }
@@ -182,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
             if (validatePassword(password))
                 editTextLoginPassword.setError("Please choose 6 digit password");
 
-            textViewRegister.setEnabled(true);
+            buttonRegister.setEnabled(true);
             progressBar.setVisibility(View.GONE);
         }
     }

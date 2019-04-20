@@ -33,6 +33,7 @@
         android:textSize="20sp" />
 
     <ImageView
+        android:id="@+id/startAuthButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_gravity="center"
