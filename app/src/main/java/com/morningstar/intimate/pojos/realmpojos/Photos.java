@@ -16,26 +16,48 @@ import io.realm.annotations.PrimaryKey;
 @Keep
 public class Photos extends RealmObject {
 
+    public static final String oldUri = "photoOldUriAsString";
+    public static final String newUri = "photoNewUriAsString";
+    public static final String imageString = "imageBase64";
+
     @PrimaryKey
-    private long photoId;
+    private int photoId;
 
-    private String photoUriAsString;
+    private String photoOldUriAsString;
     private String photoName;
+    private String photoNewUriAsString;
+    private String imageBase64;
 
-    public long getPhotoId() {
+    public String getImageBase64() {
+        return imageBase64;
+    }
+
+    public void setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
+    }
+
+    public String getPhotoNewUriAsString() {
+        return photoNewUriAsString;
+    }
+
+    public void setPhotoNewUriAsString(String photoNewUriAsString) {
+        this.photoNewUriAsString = photoNewUriAsString;
+    }
+
+    public int getPhotoId() {
         return photoId;
     }
 
-    public void setPhotoId(long photoId) {
+    public void setPhotoId(int photoId) {
         this.photoId = photoId;
     }
 
-    public String getPhotoUriAsString() {
-        return photoUriAsString;
+    public String getPhotoOldUriAsString() {
+        return photoOldUriAsString;
     }
 
-    public void setPhotoUriAsString(String photoUriAsString) {
-        this.photoUriAsString = photoUriAsString;
+    public void setPhotoOldUriAsString(String photoOldUriAsString) {
+        this.photoOldUriAsString = photoOldUriAsString;
     }
 
     public String getPhotoName() {

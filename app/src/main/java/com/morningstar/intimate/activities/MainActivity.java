@@ -11,11 +11,22 @@ package com.morningstar.intimate.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,19 +36,28 @@ import com.bvapp.arcmenulibrary.widget.FloatingActionButton;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.managers.ConstantManager;
 import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import gun0912.tedbottompicker.TedBottomPicker;
 import gun0912.tedbottompicker.TedBottomSheetDialogFragment;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "MainActivity";
 
     private static final String[] MENU_ITEMS_NAMES = {"New Photo", "New Video"};
     private static final int[] MENU_ITEMS_COLORS = {R.color.colorPrimary, R.color.secondaryDarkColor};
@@ -49,11 +69,18 @@ public class MainActivity extends AppCompatActivity {
     ArcMenu arcMenu;
     @BindView(R.id.textViewPhotoTotalCount)
     TextView textViewTotalPhotos;
+    @BindView(R.id.containerPhotos)
+    LinearLayout linearLayoutPhotoContainer;
 
     private PermissionListener permissionListener;
     private Realm realm;
     private RealmResults<Photos> photosRealmResults;
     private long photoPrimaryKey;
+    private File imageFile;
+    private File appFolder;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +94,21 @@ public class MainActivity extends AppCompatActivity {
         initArcMenu(arcMenu);
         realm = Realm.getDefaultInstance();
 
+        sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+
+        createAppFolder();
         displayTotalObjects();
+    }
+
+    private void createAppFolder() {
+        appFolder = new File(Environment.getExternalStorageDirectory() + "/Intimate", "Photos");
+        if (!appFolder.exists())
+            appFolder.mkdirs();
+    }
+
+    @OnClick(R.id.containerPhotos)
+    public void openPhotoGallery() {
+        startActivity(new Intent(MainActivity.this, ViewPhotosActivity.class));
     }
 
     @SuppressLint("SetTextI18n")
@@ -143,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPeekHeight(1600)
                 .showTitle(false)
                 .setCompleteButtonText("Done")
-                .setEmptySelectionText("Select None")
+                .setEmptySelectionText("None Selected")
                 .showMultiImage(new TedBottomSheetDialogFragment.OnMultiImageSelectedListener() {
                     @Override
                     public void onImagesSelected(List<Uri> uriList) {
@@ -155,9 +196,15 @@ public class MainActivity extends AppCompatActivity {
                                 progressDialog.setCancelable(false);
                                 progressDialog.show();
                                 for (Uri uri : uriList) {
+                                    imageFile = new File(uri.getPath());
                                     photoPrimaryKey += 1;
                                     Photos photos = realm.createObject(Photos.class, photoPrimaryKey);
-                                    photos.setPhotoUriAsString(UtilityManager.convertUriToString(uri));
+                                    photos.setPhotoOldUriAsString(UtilityManager.convertUriToString(uri));
+                                    String encodedImage = convertImageToBase64();
+                                    photos.setImageBase64(encodedImage);
+                                    String newUri = copyFileFromUri(uri);
+                                    photos.setPhotoNewUriAsString(newUri);
+//                                    deleteOriginalFile(uri);
                                 }
                                 displayTotalObjects();
                                 progressDialog.dismiss();
@@ -165,6 +212,59 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                 });
+    }
+
+    private String convertImageToBase64() {
+        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getPath());
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        if (bitmap != null)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    private void deleteOriginalFile(Uri uri) {
+        File deleteFile = new File(uri.getPath());
+        if (deleteFile.exists())
+            if (deleteFile.delete())
+                Toast.makeText(this, "File deleted", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(this, "Could not delete", Toast.LENGTH_SHORT).show();
+
+        refreshGallery();
+    }
+
+    private void refreshGallery() {
+        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i(TAG, "Scanned " + path + ":");
+                Log.i(TAG, "-> uri=" + uri);
+            }
+        });
+    }
+
+    private String copyFileFromUri(Uri uri) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+
+        try {
+            ContentResolver contentResolver = getContentResolver();
+            inputStream = contentResolver.openInputStream(uri);
+            outputStream = new FileOutputStream(appFolder + "image_" + photoPrimaryKey + ".jpg");
+            byte[] buffer = new byte[2000];
+            int bytesRead = 0;
+            if (inputStream != null) {
+                while ((bytesRead == inputStream.read(buffer, 0, buffer.length))) {
+                    outputStream.write(buffer, 0, buffer.length);
+                }
+            }
+        } catch (Exception e) {
+            Log.i(TAG, e.getMessage());
+        }
+
+        Uri uri1 = Uri.fromFile(new File(appFolder + "image_" + photoPrimaryKey + ".jpg"));
+        return UtilityManager.convertUriToString(uri1);
     }
 
     @Override
