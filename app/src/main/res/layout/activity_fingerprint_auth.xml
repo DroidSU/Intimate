@@ -47,6 +47,5 @@
         android:gravity="center"
         android:text="Touch the fingerprint sensor"
         android:textColor="@color/primary_dark"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:textSize="16sp" />
 </LinearLayout>
