@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private InterstitialAd interstitialAd;
 
     private StorageReference storageReference;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         initArcMenu(arcMenu);
         realm = Realm.getDefaultInstance();
 
-        SharedPreferences sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
         newUriList = new ArrayList<>();
 
         createAppFolder();
@@ -331,5 +332,12 @@ public class MainActivity extends AppCompatActivity {
         if (realm != null && !realm.isClosed())
             realm.close();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!interstitialAd.isLoaded())
+            loadAd();
     }
 }
