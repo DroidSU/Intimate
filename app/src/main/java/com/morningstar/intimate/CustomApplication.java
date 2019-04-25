@@ -10,6 +10,8 @@ package com.morningstar.intimate;
 
 import android.app.Application;
 
+import com.google.android.gms.ads.MobileAds;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -22,5 +24,6 @@ public class CustomApplication extends Application {
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("default.realm").build();
         Realm.setDefaultConfiguration(config);
+        MobileAds.initialize(this, getResources().getString(R.string.admob_id));
     }
 }

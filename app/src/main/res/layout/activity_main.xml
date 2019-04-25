@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:orientation="horizontal"
+        android:baselineAligned="false"
         android:weightSum="1">
 
         <LinearLayout
@@ -29,23 +30,19 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:cardBackgroundColor="@color/md_amber_300"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="4dp">
-
-            </androidx.cardview.widget.CardView>
+                android:src="@drawable/photo_icon" />
 
             <TextView
                 android:id="@+id/textViewPhotoTotalCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
-                android:text="50 photos"
+                android:text="0 photos"
                 android:textColor="@color/md_black_1000"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -58,23 +55,19 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:cardBackgroundColor="@color/md_amber_300"
-                app:cardCornerRadius="5dp"
-                app:cardElevation="4dp">
-
-            </androidx.cardview.widget.CardView>
+                android:src="@drawable/video_icon" />
 
             <TextView
                 android:id="@+id/textViewVideoTotalCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
-                android:text="50 photos"
+                android:text="0 videos"
                 android:textColor="@color/md_black_1000"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -86,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="18dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="90dp"
         app:menuChildSize="48dp"
         app:menuGravity="Bottom_Right"
         app:menuNormalColor="@color/secondaryDarkColor"
@@ -99,6 +92,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/demo_ad_unit_id" />
+        ads:adUnitId="@string/demo_banner_ad_unit_id" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

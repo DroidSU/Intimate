@@ -33,6 +33,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bvapp.arcmenulibrary.ArcMenu;
 import com.bvapp.arcmenulibrary.widget.FloatingActionButton;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.morningstar.intimate.R;
@@ -71,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
     TextView textViewTotalPhotos;
     @BindView(R.id.containerPhotos)
     LinearLayout linearLayoutPhotoContainer;
+    @BindView(R.id.textViewVideoTotalCount)
+    TextView textViewTotalVideos;
+    @BindView(R.id.containerVideos)
+    LinearLayout linearLayoutVideoContainer;
+    @BindView(R.id.mainActivityAdview)
+    AdView adView;
 
     private PermissionListener permissionListener;
     private Realm realm;
@@ -79,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private File imageFile;
     private File appFolder;
 
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private InterstitialAd interstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +102,29 @@ public class MainActivity extends AppCompatActivity {
         initArcMenu(arcMenu);
         realm = Realm.getDefaultInstance();
 
-        sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
 
         createAppFolder();
         displayTotalObjects();
+
+        loadAd();
+    }
+
+    @OnClick(R.id.containerVideos)
+    public void openVideoGallery() {
+        if (interstitialAd.isLoaded())
+            interstitialAd.show();
+        else {
+            Log.i(TAG, "Ad not loaded");
+        }
+    }
+
+    private void loadAd() {
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getResources().getString(R.string.demo_interstitial_ad_unit_id));
+        AdRequest adRequest = new AdRequest.Builder().build();
+        interstitialAd.loadAd(adRequest);
+        adView.loadAd(adRequest);
     }
 
     private void createAppFolder() {
