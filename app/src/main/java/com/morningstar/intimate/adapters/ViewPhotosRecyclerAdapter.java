@@ -27,6 +27,8 @@ import io.realm.RealmResults;
 
 public class ViewPhotosRecyclerAdapter extends RecyclerView.Adapter<ViewPhotosRecyclerAdapter.ViewPhotosViewHolder> {
 
+    private static final String TAG = "ViewPhotosAdapter";
+
     private Context context;
     private View view;
     private RealmResults<Photos> photosRealmResults;

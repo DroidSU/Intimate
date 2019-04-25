@@ -10,14 +10,11 @@ package com.morningstar.intimate.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -36,6 +34,12 @@ import com.bvapp.arcmenulibrary.widget.FloatingActionButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.morningstar.intimate.R;
@@ -45,9 +49,10 @@ import com.morningstar.intimate.pojos.realmpojos.Photos;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -87,8 +92,12 @@ public class MainActivity extends AppCompatActivity {
     private long photoPrimaryKey;
     private File imageFile;
     private File appFolder;
+    private String newUri;
+    private List<String> newUriList;
 
     private InterstitialAd interstitialAd;
+
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        newUriList = new ArrayList<>();
 
         createAppFolder();
         displayTotalObjects();
@@ -125,10 +135,12 @@ public class MainActivity extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         interstitialAd.loadAd(adRequest);
         adView.loadAd(adRequest);
+
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 
     private void createAppFolder() {
-        appFolder = new File(Environment.getExternalStorageDirectory() + "/Intimate", "Photos");
+        appFolder = new File(Environment.getExternalStorageDirectory() + "/.intimate", "photos");
         if (!appFolder.exists())
             appFolder.mkdirs();
     }
@@ -210,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         TedBottomPicker.with(MainActivity.this)
                 .setPeekHeight(1600)
                 .showTitle(false)
-                .setCompleteButtonText("Done")
+                .setCompleteButtonText("Import")
                 .setEmptySelectionText("None Selected")
                 .showMultiImage(new TedBottomSheetDialogFragment.OnMultiImageSelectedListener() {
                     @Override
@@ -218,10 +230,6 @@ public class MainActivity extends AppCompatActivity {
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-                                progressDialog.setTitle("Please wait");
-                                progressDialog.setCancelable(false);
-                                progressDialog.show();
                                 for (Uri uri : uriList) {
                                     imageFile = new File(uri.getPath());
                                     photoPrimaryKey += 1;
@@ -229,16 +237,43 @@ public class MainActivity extends AppCompatActivity {
                                     photos.setPhotoOldUriAsString(UtilityManager.convertUriToString(uri));
                                     String encodedImage = convertImageToBase64();
                                     photos.setImageBase64(encodedImage);
-                                    String newUri = copyFileFromUri(uri);
+                                    newUri = copyFileFromUri(uri);
+                                    newUriList.add(newUri);
                                     photos.setPhotoNewUriAsString(newUri);
-//                                    deleteOriginalFile(uri);
+                                    deleteOriginalFile(uri);
                                 }
                                 displayTotalObjects();
-                                progressDialog.dismiss();
                             }
                         });
+
+                        uploadToFirebase(newUriList);
                     }
                 });
+    }
+
+    private void uploadToFirebase(List<String> uriList) {
+        for (String uriString : uriList) {
+            Uri uri = UtilityManager.convertStringToUri(uriString);
+            File file = new File(uri.getPath());
+            String fileName = file.getName();
+            String email = sharedPreferences.getString(ConstantManager.USER_EMAIL, "example");
+            StorageReference userRef = storageReference.child("images/" + email + "/" + fileName);
+
+            userRef.putFile(uri)
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if (!task.isSuccessful())
+                                Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
     private String convertImageToBase64() {
@@ -254,43 +289,40 @@ public class MainActivity extends AppCompatActivity {
     private void deleteOriginalFile(Uri uri) {
         File deleteFile = new File(uri.getPath());
         if (deleteFile.exists())
-            if (deleteFile.delete())
-                Toast.makeText(this, "File deleted", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(this, "Could not delete", Toast.LENGTH_SHORT).show();
+            if (!deleteFile.delete())
+                Toast.makeText(this, "Could not delete original file", Toast.LENGTH_SHORT).show();
 
-        refreshGallery();
+        refreshGallery(uri);
     }
 
-    private void refreshGallery() {
-        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i(TAG, "Scanned " + path + ":");
-                Log.i(TAG, "-> uri=" + uri);
-            }
-        });
+    private void refreshGallery(Uri uri) {
+//        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+//            public void onScanCompleted(String path, Uri uri) {
+//                Log.i(TAG, "Scanned " + path + ":");
+//                Log.i(TAG, "-> uri=" + uri);
+//            }
+//        });
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
     }
 
     private String copyFileFromUri(Uri uri) {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        FileInputStream inputStream = null;
+        FileOutputStream outputStream = null;
 
         try {
-            ContentResolver contentResolver = getContentResolver();
-            inputStream = contentResolver.openInputStream(uri);
-            outputStream = new FileOutputStream(appFolder + "image_" + photoPrimaryKey + ".jpg");
-            byte[] buffer = new byte[2000];
-            int bytesRead = 0;
-            if (inputStream != null) {
-                while ((bytesRead == inputStream.read(buffer, 0, buffer.length))) {
-                    outputStream.write(buffer, 0, buffer.length);
-                }
-            }
+            inputStream = new FileInputStream(new File(uri.getPath()));
+            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis());
+
+            FileChannel inputChannel = inputStream.getChannel();
+            FileChannel outChannel = outputStream.getChannel();
+            inputChannel.transferTo(0, inputChannel.size(), outChannel);
+            inputStream.close();
+            outputStream.close();
         } catch (Exception e) {
             Log.i(TAG, e.getMessage());
         }
 
-        Uri uri1 = Uri.fromFile(new File(appFolder + "image_" + photoPrimaryKey + ".jpg"));
+        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis()));
         return UtilityManager.convertUriToString(uri1);
     }
 
