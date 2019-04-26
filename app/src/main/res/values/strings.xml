@@ -8,4 +8,5 @@
     <string name="admob_banner_ad_unit_id">ca-app-pub-4337844951984192/2840262785</string>
     <string name="admob_interstitial_ad_unit_id">ca-app-pub-4337844951984192/8084850609</string>
     <string name="admob_id">ca-app-pub-4337844951984192~7100261364</string>
+    <string name="enter_4_digit_pin">Enter 4 digit pin</string>
 </resources>

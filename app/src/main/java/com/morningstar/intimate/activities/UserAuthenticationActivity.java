@@ -10,6 +10,7 @@ package com.morningstar.intimate.activities;
 
 import android.Manifest;
 import android.app.KeyguardManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.hardware.fingerprint.FingerprintManager;
@@ -22,6 +23,10 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.helpers.FingerprintHandler;
 import com.morningstar.intimate.managers.BiometricManager;
@@ -33,9 +38,6 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -89,7 +91,8 @@ public class UserAuthenticationActivity extends AppCompatActivity {
 
     @OnClick(R.id.setUpPinCode)
     public void setUpPinCode() {
-        Toast.makeText(this, "Why!", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(UserAuthenticationActivity.this, PinAuthActivity.class));
+        finish();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
