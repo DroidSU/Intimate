@@ -12,16 +12,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.CancellationSignal;
 import android.widget.Toast;
 
-import com.morningstar.intimate.activities.MainActivity;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+
+import com.morningstar.intimate.activities.MainActivity;
+import com.morningstar.intimate.managers.ConstantManager;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
@@ -42,7 +44,10 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
     @Override
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-        Toast.makeText(context, "success", Toast.LENGTH_SHORT).show();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(ConstantManager.SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(ConstantManager.IS_BIOMETRIC_SET, true);
+        editor.apply();
         context.startActivity(new Intent(context, MainActivity.class));
         ((Activity) context).finish();
         super.onAuthenticationSucceeded(result);

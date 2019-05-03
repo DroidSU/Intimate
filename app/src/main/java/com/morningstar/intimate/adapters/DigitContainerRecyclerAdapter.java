@@ -18,6 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.pojos.eventpojos.PinDigitClickedEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class DigitContainerRecyclerAdapter extends RecyclerView.Adapter<DigitContainerRecyclerAdapter.DigitViewHolder> {
 
@@ -39,6 +42,14 @@ public class DigitContainerRecyclerAdapter extends RecyclerView.Adapter<DigitCon
     public void onBindViewHolder(@NonNull DigitViewHolder holder, int position) {
         String currentPinNumber = String.valueOf(position + 1);
         holder.textView.setText(currentPinNumber);
+        holder.textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PinDigitClickedEvent pinDigitClickedEvent = new PinDigitClickedEvent();
+                pinDigitClickedEvent.setValue(currentPinNumber);
+                EventBus.getDefault().post(pinDigitClickedEvent);
+            }
+        });
     }
 
     @Override

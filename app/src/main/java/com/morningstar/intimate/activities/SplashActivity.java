@@ -13,10 +13,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.managers.ConstantManager;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -39,7 +39,7 @@ public class SplashActivity extends AppCompatActivity {
                             startActivity(new Intent(SplashActivity.this, FingerprintAuthActivity.class));
                             finish();
                         } else {
-                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                            startActivity(new Intent(SplashActivity.this, PinAuthActivity.class));
                             finish();
                         }
                     } else {

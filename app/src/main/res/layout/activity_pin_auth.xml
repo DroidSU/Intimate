@@ -22,7 +22,7 @@
         android:gravity="center"
         android:text="@string/enter_4_digit_pin"
         android:textColor="@color/primary_dark"
-        android:textSize="22sp" />
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +41,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:enabled="false"
-            android:inputType="none" />
+            android:inputType="none"
+            android:textAlignment="center"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/editText_pin_second_digit"
@@ -49,7 +52,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:enabled="false"
-            android:inputType="none" />
+            android:inputType="none"
+            android:textAlignment="center"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/editText_pin_third_digit"
@@ -57,7 +63,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:enabled="false"
-            android:inputType="none" />
+            android:inputType="none"
+            android:textAlignment="center"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/editText_pin_fourth_digit"
@@ -65,7 +74,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.25"
             android:enabled="false"
-            android:inputType="none" />
+            android:inputType="none"
+            android:textAlignment="center"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -95,6 +107,7 @@
             android:src="@drawable/ic_backspace_black_24dp" />
 
         <TextView
+            android:id="@+id/pin_digit_zero"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="40dp"

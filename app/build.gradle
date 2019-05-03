@@ -61,5 +61,6 @@ dependencies {
     implementation 'gun0912.ted:tedbottompicker:2.0.0-alpha1'
     //TedPermissions
     implementation 'gun0912.ted:tedpermission:2.2.2'
-
+    //EventBus
+    implementation 'org.greenrobot:eventbus:3.1.1'
 }
