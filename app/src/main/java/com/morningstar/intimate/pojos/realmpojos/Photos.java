@@ -19,6 +19,7 @@ public class Photos extends RealmObject {
     public static final String oldUri = "photoOldUriAsString";
     public static final String newUri = "photoNewUriAsString";
     public static final String imageString = "imageBase64";
+    public static final String ID = "photoId";
 
     @PrimaryKey
     private int photoId;

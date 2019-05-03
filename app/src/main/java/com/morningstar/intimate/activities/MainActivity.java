@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                        uploadToFirebase(newUriList);
+//                        uploadToFirebase(newUriList);
                     }
                 });
     }

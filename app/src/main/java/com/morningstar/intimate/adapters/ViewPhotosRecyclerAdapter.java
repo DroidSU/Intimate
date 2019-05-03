@@ -9,6 +9,7 @@
 package com.morningstar.intimate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
@@ -21,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.activities.PhotoDetailedActivity;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
 
 import io.realm.RealmResults;
@@ -51,6 +53,14 @@ public class ViewPhotosRecyclerAdapter extends RecyclerView.Adapter<ViewPhotosRe
             byte[] decodedImage = Base64.decode(photosRealmResults.get(position).getImageBase64(), Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
             holder.imageView.setImageBitmap(decodedByte);
+            holder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, PhotoDetailedActivity.class);
+                    intent.putExtra(Photos.ID, photosRealmResults.get(position).getPhotoId());
+                    context.startActivity(intent);
+                }
+            });
         }
 //        if (photosRealmResults.get(position) != null) {
 //            Picasso.get().load(photosRealmResults.get(position).getPhotoNewUriAsString()).into(holder.imageView);
