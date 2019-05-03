@@ -8,13 +8,18 @@
 
 package com.morningstar.intimate.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
@@ -27,14 +32,20 @@ public class PhotoDetailedActivity extends AppCompatActivity {
 
     @BindView(R.id.imageViewDetailedPhoto)
     ImageView imageView;
+    @BindView(R.id.rootLayout)
+    CoordinatorLayout coordinatorLayout;
 
     private Photos photo;
     private int photoid;
     private Realm realm;
 
+    private boolean isFullScreen;
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_photo_detailed);
         ButterKnife.bind(this);
 
@@ -42,6 +53,21 @@ public class PhotoDetailedActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         getPhotoFromRealm();
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFullScreen) {
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                    isFullScreen = false;
+                } else {
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    isFullScreen = true;
+                }
+            }
+        });
     }
 
     private void getPhotoFromRealm() {

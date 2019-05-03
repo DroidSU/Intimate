@@ -21,8 +21,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.PhotoDetailedActivity"></activity>
-        <activity android:name=".activities.PinAuthActivity" />
+        <activity
+            android:name=".activities.PhotoDetailedActivity"
+            android:screenOrientation="portrait" />
+        <!--android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"-->
+        <activity
+            android:name=".activities.PinAuthActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ViewPhotosActivity"
             android:screenOrientation="portrait" />
