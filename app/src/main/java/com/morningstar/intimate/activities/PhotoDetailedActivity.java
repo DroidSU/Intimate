@@ -14,10 +14,12 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.morningstar.intimate.R;
@@ -33,6 +35,8 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     ImageView imageView;
     @BindView(R.id.rootLayout)
     CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.detailedPhotoToolbar)
+    Toolbar toolbar;
 
     private Photos photo;
     private int photoid;
@@ -44,11 +48,17 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_photo_detailed);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Photo");
+        getSupportActionBar().hide();
+
         photoid = getIntent().getIntExtra(Photos.ID, 0);
         realm = Realm.getDefaultInstance();
+        isFullScreen = true;
 
         getPhotoFromRealm();
 
@@ -58,14 +68,39 @@ public class PhotoDetailedActivity extends AppCompatActivity {
                 if (isFullScreen) {
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                    getSupportActionBar().show();
                     isFullScreen = false;
                 } else {
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    getSupportActionBar().hide();
                     isFullScreen = true;
                 }
             }
         });
+    }
+
+    private void showSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+    }
+
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
     }
 
     private void getPhotoFromRealm() {

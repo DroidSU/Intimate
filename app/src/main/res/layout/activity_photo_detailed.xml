@@ -13,8 +13,16 @@
     android:id="@+id/rootLayout"
     tools:context=".activities.PhotoDetailedActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/detailedPhotoToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </androidx.appcompat.widget.Toolbar>
+
     <ImageView
         android:id="@+id/imageViewDetailedPhoto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?android:attr/actionBarSize" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
