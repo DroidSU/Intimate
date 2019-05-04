@@ -13,8 +13,8 @@
 
     <ImageView
         android:id="@+id/photo_item"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_margin="8dp"
         android:scaleType="centerCrop" />
 </LinearLayout>

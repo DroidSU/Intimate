@@ -13,12 +13,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.adapters.ViewPhotosRecyclerAdapter;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +34,8 @@ public class ViewPhotosActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.simpleNoItemTextView)
     TextView textView;
+    @BindView(R.id.viewPhotosToolbar)
+    Toolbar toolbar;
 
     private Realm realm;
     private ViewPhotosRecyclerAdapter viewPhotosRecyclerAdapter;
@@ -43,6 +48,9 @@ public class ViewPhotosActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
 
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Photo Vault");
+
         getPhotos();
         setUpRecyclerView();
     }
@@ -52,7 +60,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
     }
 
     private void setUpRecyclerView() {
-        recyclerView.setLayoutManager(new GridLayoutManager(ViewPhotosActivity.this, 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(ViewPhotosActivity.this, 3));
         if (photosRealmResults != null && photosRealmResults.size() != 0) {
             viewPhotosRecyclerAdapter = new ViewPhotosRecyclerAdapter(this, photosRealmResults);
             recyclerView.setAdapter(viewPhotosRecyclerAdapter);
