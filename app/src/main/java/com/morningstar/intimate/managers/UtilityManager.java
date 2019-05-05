@@ -9,9 +9,13 @@
 package com.morningstar.intimate.managers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Base64;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class UtilityManager {
@@ -42,5 +46,15 @@ public class UtilityManager {
 
     public static Uri convertStringToUri(String string) {
         return Uri.parse(string);
+    }
+
+    public static String convertImageToBase64(String imageFilePath) {
+        Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        if (bitmap != null)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 }

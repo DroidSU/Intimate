@@ -11,23 +11,30 @@ package com.morningstar.intimate.activities;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.helpers.FileServiceHelper;
+import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class PhotoDetailedActivity extends AppCompatActivity {
 
@@ -117,5 +124,46 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detailed_photo, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.delete) {
+            Toast.makeText(this, "Wait", Toast.LENGTH_SHORT).show();
+        }
+        if (item.getItemId() == R.id.restore) {
+            //get the original and the current uri
+            Uri currentUri = UtilityManager.convertStringToUri(photo.getPhotoNewUriAsString());
+            Uri originalUri = UtilityManager.convertStringToUri(photo.getPhotoOldUriAsString());
+            //create the new file
+            FileServiceHelper.createFile(originalUri.getPath());
+            //move current file to restored file path
+            String restoredUri = FileServiceHelper.restoreFileToUri(currentUri, originalUri);
+            //remove object from db
+            deleteObjectFromRealm();
+            //delete file from current path
+            FileServiceHelper.deleteFile(PhotoDetailedActivity.this, currentUri);
+            //refresh the gallery
+            FileServiceHelper.refreshGallery(this, UtilityManager.convertStringToUri(restoredUri));
+            Toast.makeText(this, "done!", Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        }
+        return true;
+    }
+
+    private void deleteObjectFromRealm() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Photos> photosRealmResults = realm.where(Photos.class).equalTo(Photos.ID, photoid).findAll();
+                photosRealmResults.deleteAllFromRealm();
+            }
+        });
     }
 }

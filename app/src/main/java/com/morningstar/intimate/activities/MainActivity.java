@@ -12,13 +12,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -44,15 +41,12 @@ import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.morningstar.intimate.R;
+import com.morningstar.intimate.helpers.FileServiceHelper;
 import com.morningstar.intimate.managers.ConstantManager;
 import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,14 +229,21 @@ public class MainActivity extends AppCompatActivity {
                                 for (Uri uri : uriList) {
                                     imageFile = new File(uri.getPath());
                                     photoPrimaryKey += 1;
+                                    //create object in realm
                                     Photos photos = realm.createObject(Photos.class, photoPrimaryKey);
+                                    //store the old uri in case to be restored later
                                     photos.setPhotoOldUriAsString(UtilityManager.convertUriToString(uri));
-                                    String encodedImage = convertImageToBase64();
+                                    //get base64 encoded string of image
+                                    String encodedImage = UtilityManager.convertImageToBase64(imageFile.getPath());
                                     photos.setImageBase64(encodedImage);
-                                    newUri = copyFileFromUri(uri);
+                                    //get the new uri of the moved file
+                                    newUri = FileServiceHelper.copyFileFromUri(uri, appFolder, photoPrimaryKey);
                                     newUriList.add(newUri);
+                                    //store the new uri
                                     photos.setPhotoNewUriAsString(newUri);
-                                    deleteOriginalFile(uri);
+                                    //delete original file and refresh gallery
+                                    FileServiceHelper.deleteFile(MainActivity.this, uri);
+                                    FileServiceHelper.refreshGallery(MainActivity.this, uri);
                                 }
                                 displayTotalObjects();
                             }
@@ -276,56 +277,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
-    }
-
-    private String convertImageToBase64() {
-        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getPath());
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        if (bitmap != null)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
-    }
-
-    private void deleteOriginalFile(Uri uri) {
-        File deleteFile = new File(uri.getPath());
-        if (deleteFile.exists())
-            if (!deleteFile.delete())
-                Toast.makeText(this, "Could not delete original file", Toast.LENGTH_SHORT).show();
-
-        refreshGallery(uri);
-    }
-
-    private void refreshGallery(Uri uri) {
-//        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-//            public void onScanCompleted(String path, Uri uri) {
-//                Log.i(TAG, "Scanned " + path + ":");
-//                Log.i(TAG, "-> uri=" + uri);
-//            }
-//        });
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
-    }
-
-    private String copyFileFromUri(Uri uri) {
-        FileInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-
-        try {
-            inputStream = new FileInputStream(new File(uri.getPath()));
-            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis());
-
-            FileChannel inputChannel = inputStream.getChannel();
-            FileChannel outChannel = outputStream.getChannel();
-            inputChannel.transferTo(0, inputChannel.size(), outChannel);
-            inputStream.close();
-            outputStream.close();
-        } catch (Exception e) {
-            Log.i(TAG, e.getMessage());
-        }
-
-        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis()));
-        return UtilityManager.convertUriToString(uri1);
     }
 
     @Override
