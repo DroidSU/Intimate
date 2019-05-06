@@ -43,6 +43,7 @@ import com.gun0912.tedpermission.TedPermission;
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.helpers.FileServiceHelper;
 import com.morningstar.intimate.managers.ConstantManager;
+import com.morningstar.intimate.managers.PrimaryKeyManager;
 import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.eventpojos.RefreshRealmEvent;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
@@ -89,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
     private PermissionListener permissionListener;
     private Realm realm;
     private RealmResults<Photos> photosRealmResults;
-    private long photoPrimaryKey;
+    private long totalPhotoCount;
+    private String photoPrimaryKey;
     private File imageFile;
     private File appFolder;
     private String newUri;
@@ -149,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.containerPhotos)
     public void openPhotoGallery() {
         startActivity(new Intent(MainActivity.this, ViewPhotosActivity.class));
+        finish();
     }
 
     @SuppressLint("SetTextI18n")
@@ -156,10 +159,10 @@ public class MainActivity extends AppCompatActivity {
         photosRealmResults = realm.where(Photos.class).findAll();
         if (photosRealmResults != null) {
             textViewTotalPhotos.setText(photosRealmResults.size() + " Photos");
-            photoPrimaryKey = photosRealmResults.size();
+            totalPhotoCount = photosRealmResults.size();
         } else {
             textViewTotalPhotos.setText("0 Photos");
-            photoPrimaryKey = 0;
+            totalPhotoCount = 0;
         }
     }
 
@@ -233,7 +236,8 @@ public class MainActivity extends AppCompatActivity {
                             public void execute(Realm realm) {
                                 for (Uri uri : uriList) {
                                     imageFile = new File(uri.getPath());
-                                    photoPrimaryKey += 1;
+                                    totalPhotoCount += 1;
+                                    photoPrimaryKey = PrimaryKeyManager.getPrimaryKeyForNewPhoto(totalPhotoCount);
                                     //create object in realm
                                     Photos photos = realm.createObject(Photos.class, photoPrimaryKey);
                                     //store the old uri in case to be restored later

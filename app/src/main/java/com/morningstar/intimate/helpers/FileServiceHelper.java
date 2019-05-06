@@ -36,14 +36,13 @@ public class FileServiceHelper {
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
     }
 
-    public static String copyFileFromUri(Uri uri, File appFolder, long photoPrimaryKey) {
+    public static String copyFileFromUri(Uri uri, File appFolder, String photoPrimaryKey) {
         FileInputStream inputStream = null;
         FileOutputStream outputStream = null;
-        long timeStamp = System.currentTimeMillis();
 
         try {
             inputStream = new FileInputStream(new File(uri.getPath()));
-            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey + "_" + timeStamp);
+            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey);
 
             FileChannel inputChannel = inputStream.getChannel();
             FileChannel outChannel = outputStream.getChannel();
@@ -54,7 +53,7 @@ public class FileServiceHelper {
             Log.i(TAG, e.getMessage());
         }
 
-        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey + "_" + timeStamp));
+        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey));
         return UtilityManager.convertUriToString(uri1);
     }
 

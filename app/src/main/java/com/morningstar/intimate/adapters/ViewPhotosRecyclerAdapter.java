@@ -8,6 +8,7 @@
 
 package com.morningstar.intimate.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -59,6 +60,7 @@ public class ViewPhotosRecyclerAdapter extends RecyclerView.Adapter<ViewPhotosRe
                     Intent intent = new Intent(context, PhotoDetailedActivity.class);
                     intent.putExtra(Photos.ID, photosRealmResults.get(position).getPhotoId());
                     context.startActivity(intent);
+                    ((Activity) context).finish();
                 }
             });
         }

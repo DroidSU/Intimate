@@ -8,6 +8,7 @@
 
 package com.morningstar.intimate.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -80,6 +81,13 @@ public class ViewPhotosActivity extends AppCompatActivity {
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(ViewPhotosActivity.this, MainActivity.class));
         finish();
     }
 

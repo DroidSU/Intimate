@@ -22,7 +22,7 @@ public class Photos extends RealmObject {
     public static final String ID = "photoId";
 
     @PrimaryKey
-    private int photoId;
+    private String photoId;
 
     private String photoOldUriAsString;
     private String photoName;
@@ -45,11 +45,11 @@ public class Photos extends RealmObject {
         this.photoNewUriAsString = photoNewUriAsString;
     }
 
-    public int getPhotoId() {
+    public String getPhotoId() {
         return photoId;
     }
 
-    public void setPhotoId(int photoId) {
+    public void setPhotoId(String photoId) {
         this.photoId = photoId;
     }
 

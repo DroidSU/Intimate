@@ -9,6 +9,7 @@
 package com.morningstar.intimate.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -47,7 +48,7 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     Toolbar toolbar;
 
     private Photos photo;
-    private int photoid;
+    private String photoid;
     private Realm realm;
 
     private boolean isFullScreen;
@@ -64,7 +65,7 @@ public class PhotoDetailedActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Photo");
         getSupportActionBar().hide();
 
-        photoid = getIntent().getIntExtra(Photos.ID, 0);
+        photoid = getIntent().getStringExtra(Photos.ID);
         realm = Realm.getDefaultInstance();
         isFullScreen = true;
 
@@ -137,6 +138,7 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        startActivity(new Intent(PhotoDetailedActivity.this, ViewPhotosActivity.class));
         finish();
     }
 

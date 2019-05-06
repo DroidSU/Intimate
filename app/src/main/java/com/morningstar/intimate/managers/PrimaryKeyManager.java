@@ -10,7 +10,8 @@ package com.morningstar.intimate.managers;
 
 public class PrimaryKeyManager {
 
-    public static void getPrimaryKeyForNewPhoto() {
-
+    public static String getPrimaryKeyForNewPhoto(long photoNumber) {
+        String primaryKey = photoNumber + "_" + System.currentTimeMillis();
+        return primaryKey;
     }
 }

@@ -8,6 +8,9 @@
 
 package com.morningstar.intimate.pojos.eventpojos;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class RefreshRealmEvent {
 
 }
