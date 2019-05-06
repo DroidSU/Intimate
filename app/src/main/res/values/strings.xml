@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Privmate</string>
     <string name="create_new_account">Create new account</string>
-    <string name="unlock_intimate">Unlock Intimate</string>
+    <string name="unlock_privmate">Unlock Privmate</string>
     <string name="this_app_uses_fingerprint_to_protect_your_private_data">This app uses fingerprint to protect your private data</string>
     <string name="demo_banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="demo_interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>

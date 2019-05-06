@@ -18,9 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -29,7 +27,10 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.helpers.FileServiceHelper;
 import com.morningstar.intimate.managers.UtilityManager;
+import com.morningstar.intimate.pojos.eventpojos.RefreshRealmEvent;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,13 +74,15 @@ public class PhotoDetailedActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isFullScreen) {
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+//                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                    showSystemUI();
                     getSupportActionBar().show();
                     isFullScreen = false;
                 } else {
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+//                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    hideSystemUI();
                     getSupportActionBar().hide();
                     isFullScreen = true;
                 }
@@ -88,6 +91,13 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     }
 
     private void showSystemUI() {
+        getWindow().clearFlags(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -97,6 +107,10 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     }
 
     private void hideSystemUI() {
+        getWindow().clearFlags(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 // Set the content to appear under the system bars so that the
@@ -135,26 +149,45 @@ public class PhotoDetailedActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.delete) {
-            Toast.makeText(this, "Wait", Toast.LENGTH_SHORT).show();
+            deletePhoto();
         }
         if (item.getItemId() == R.id.restore) {
-            //get the original and the current uri
-            Uri currentUri = UtilityManager.convertStringToUri(photo.getPhotoNewUriAsString());
-            Uri originalUri = UtilityManager.convertStringToUri(photo.getPhotoOldUriAsString());
-            //create the new file
-            FileServiceHelper.createFile(originalUri.getPath());
-            //move current file to restored file path
-            String restoredUri = FileServiceHelper.restoreFileToUri(currentUri, originalUri);
-            //remove object from db
-            deleteObjectFromRealm();
-            //delete file from current path
-            FileServiceHelper.deleteFile(PhotoDetailedActivity.this, currentUri);
-            //refresh the gallery
-            FileServiceHelper.refreshGallery(this, UtilityManager.convertStringToUri(restoredUri));
-            Toast.makeText(this, "done!", Toast.LENGTH_SHORT).show();
-            onBackPressed();
+            restoreFile();
         }
         return true;
+    }
+
+    private void deletePhoto() {
+        //get the original and the current uri
+        Uri currentUri = UtilityManager.convertStringToUri(photo.getPhotoNewUriAsString());
+        //remove object from db
+        deleteObjectFromRealm();
+        //delete file from current path
+        FileServiceHelper.deleteFile(PhotoDetailedActivity.this, currentUri);
+        //refresh the gallery
+        FileServiceHelper.refreshGallery(this, currentUri);
+
+        EventBus.getDefault().post(new RefreshRealmEvent());
+
+        onBackPressed();
+    }
+
+    private void restoreFile() {
+        //get the original and the current uri
+        Uri currentUri = UtilityManager.convertStringToUri(photo.getPhotoNewUriAsString());
+        Uri originalUri = UtilityManager.convertStringToUri(photo.getPhotoOldUriAsString());
+        //create the new file
+        FileServiceHelper.createFile(originalUri.getPath());
+        //move current file to restored file path
+        String restoredUri = FileServiceHelper.restoreFileToUri(currentUri, originalUri);
+        //remove object from db
+        deleteObjectFromRealm();
+        //delete file from current path
+        FileServiceHelper.deleteFile(PhotoDetailedActivity.this, currentUri);
+        //refresh the gallery
+        FileServiceHelper.refreshGallery(this, currentUri);
+        FileServiceHelper.refreshGallery(this, UtilityManager.convertStringToUri(restoredUri));
+        onBackPressed();
     }
 
     private void deleteObjectFromRealm() {
@@ -165,5 +198,10 @@ public class PhotoDetailedActivity extends AppCompatActivity {
                 photosRealmResults.deleteAllFromRealm();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -16,7 +16,8 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/detailedPhotoToolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp">
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -24,6 +25,5 @@
         android:id="@+id/imageViewDetailedPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:scaleType="centerCrop" />
+        android:layout_marginTop="?android:attr/actionBarSize" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

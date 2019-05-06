@@ -19,7 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.adapters.ViewPhotosRecyclerAdapter;
+import com.morningstar.intimate.pojos.eventpojos.RefreshRealmEvent;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Objects;
 
@@ -46,6 +51,7 @@ public class ViewPhotosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_photos);
         ButterKnife.bind(this);
+        EventBus.getDefault().register(this);
         realm = Realm.getDefaultInstance();
 
         setSupportActionBar(toolbar);
@@ -72,7 +78,14 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
         finish();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refreshRealm(RefreshRealmEvent refreshRealmEvent) {
+        getPhotos();
+        setUpRecyclerView();
     }
 }

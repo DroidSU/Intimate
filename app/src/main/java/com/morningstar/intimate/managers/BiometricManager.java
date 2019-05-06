@@ -23,14 +23,15 @@ import android.security.keystore.KeyProperties;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+
+import com.morningstar.intimate.R;
 import com.morningstar.intimate.activities.MainActivity;
 
 import java.security.KeyStore;
 
 import javax.crypto.KeyGenerator;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 public class BiometricManager {
 
@@ -48,7 +49,7 @@ public class BiometricManager {
                 if (BiometricManager.isFingerprintAvailable(context)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         biometricPrompt = new BiometricPrompt.Builder(context)
-                                .setTitle("Intimate")
+                                .setTitle(context.getResources().getString(R.string.app_name))
                                 .setDescription("Your fingerprint will be used to authenticate into the app")
                                 .setNegativeButton("Cancel", context.getMainExecutor(), new DialogInterface.OnClickListener() {
                                     @Override

@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
         android:gravity="center"
-        android:text="@string/unlock_intimate"
+        android:text="@string/unlock_privmate"
         android:textColor="@color/md_black_1000"
         android:textSize="26sp" />
 
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="Touch the fingerprint sensor"
+        android:text="Touch the fingerprint icon"
         android:textColor="@color/primary_dark"
         android:textSize="16sp" />
 </LinearLayout>

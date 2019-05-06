@@ -44,7 +44,12 @@ import com.morningstar.intimate.R;
 import com.morningstar.intimate.helpers.FileServiceHelper;
 import com.morningstar.intimate.managers.ConstantManager;
 import com.morningstar.intimate.managers.UtilityManager;
+import com.morningstar.intimate.pojos.eventpojos.RefreshRealmEvent;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -102,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-
+        EventBus.getDefault().register(this);
         initialiseArcMenu();
         initArcMenu(arcMenu);
         realm = Realm.getDefaultInstance();
@@ -283,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (realm != null && !realm.isClosed())
             realm.close();
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -297,5 +303,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
         return true;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refreshRealm(RefreshRealmEvent refreshRealmEvent) {
+        displayTotalObjects();
     }
 }

@@ -18,6 +18,7 @@ import com.morningstar.intimate.managers.UtilityManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class FileServiceHelper {
@@ -38,10 +39,11 @@ public class FileServiceHelper {
     public static String copyFileFromUri(Uri uri, File appFolder, long photoPrimaryKey) {
         FileInputStream inputStream = null;
         FileOutputStream outputStream = null;
+        long timeStamp = System.currentTimeMillis();
 
         try {
             inputStream = new FileInputStream(new File(uri.getPath()));
-            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis());
+            outputStream = new FileOutputStream(appFolder + "/image_" + photoPrimaryKey + "_" + timeStamp);
 
             FileChannel inputChannel = inputStream.getChannel();
             FileChannel outChannel = outputStream.getChannel();
@@ -52,7 +54,7 @@ public class FileServiceHelper {
             Log.i(TAG, e.getMessage());
         }
 
-        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey + "_" + System.currentTimeMillis()));
+        Uri uri1 = Uri.fromFile(new File(appFolder + "/image_" + photoPrimaryKey + "_" + timeStamp));
         return UtilityManager.convertUriToString(uri1);
     }
 
@@ -79,8 +81,13 @@ public class FileServiceHelper {
 
     public static File createFile(String filePath) {
         File file = new File(filePath);
-        if (!file.exists())
-            file.mkdirs();
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return file;
     }
 }
