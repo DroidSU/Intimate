@@ -8,7 +8,6 @@
 
 package com.morningstar.intimate.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -57,9 +56,6 @@ public class ViewPhotosActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Photo Vault");
-
-        getPhotos();
-        setUpRecyclerView();
     }
 
     private void getPhotos() {
@@ -87,12 +83,19 @@ public class ViewPhotosActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(ViewPhotosActivity.this, MainActivity.class));
+//        startActivity(new Intent(ViewPhotosActivity.this, MainActivity.class));
         finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refreshRealm(RefreshRealmEvent refreshRealmEvent) {
+        getPhotos();
+        setUpRecyclerView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         getPhotos();
         setUpRecyclerView();
     }

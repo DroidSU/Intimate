@@ -8,12 +8,9 @@
 
 package com.morningstar.intimate.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +21,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.morningstar.intimate.R;
 import com.morningstar.intimate.activities.PhotoDetailedActivity;
+import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 import io.realm.RealmResults;
 
@@ -51,16 +52,17 @@ public class ViewPhotosRecyclerAdapter extends RecyclerView.Adapter<ViewPhotosRe
     @Override
     public void onBindViewHolder(@NonNull ViewPhotosViewHolder holder, int position) {
         if (photosRealmResults.get(position) != null) {
-            byte[] decodedImage = Base64.decode(photosRealmResults.get(position).getImageBase64(), Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
-            holder.imageView.setImageBitmap(decodedByte);
+//            byte[] decodedImage = Base64.decode(photosRealmResults.get(position).getImageBase64(), Base64.DEFAULT);
+//            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+//            holder.imageView.setImageBitmap(decodedByte);
+            Uri uri = UtilityManager.convertStringToUri(photosRealmResults.get(position).getPhotoNewUriAsString());
+            Picasso.get().load(new File(uri.getPath())).into(holder.imageView);
             holder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, PhotoDetailedActivity.class);
                     intent.putExtra(Photos.ID, photosRealmResults.get(position).getPhotoId());
                     context.startActivity(intent);
-                    ((Activity) context).finish();
                 }
             });
         }

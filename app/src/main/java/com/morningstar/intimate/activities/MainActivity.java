@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private SharedPreferences sharedPreferences;
 
+    private boolean adBeforePhotoShown;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,9 +120,10 @@ public class MainActivity extends AppCompatActivity {
         newUriList = new ArrayList<>();
 
         createAppFolder();
-        displayTotalObjects();
+//        displayTotalObjects();
 
         loadAd();
+        adBeforePhotoShown = false;
     }
 
     @OnClick(R.id.containerVideos)
@@ -150,8 +153,16 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.containerPhotos)
     public void openPhotoGallery() {
-        startActivity(new Intent(MainActivity.this, ViewPhotosActivity.class));
-        finish();
+        if (adBeforePhotoShown)
+            startActivity(new Intent(MainActivity.this, ViewPhotosActivity.class));
+        else {
+            if (interstitialAd.isLoaded())
+                interstitialAd.show();
+            else {
+                startActivity(new Intent(MainActivity.this, ViewPhotosActivity.class));
+            }
+            adBeforePhotoShown = true;
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -311,6 +322,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refreshRealm(RefreshRealmEvent refreshRealmEvent) {
+        displayTotalObjects();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         displayTotalObjects();
     }
 }

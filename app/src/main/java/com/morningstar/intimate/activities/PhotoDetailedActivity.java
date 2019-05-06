@@ -9,12 +9,8 @@
 package com.morningstar.intimate.activities;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +26,11 @@ import com.morningstar.intimate.helpers.FileServiceHelper;
 import com.morningstar.intimate.managers.UtilityManager;
 import com.morningstar.intimate.pojos.eventpojos.RefreshRealmEvent;
 import com.morningstar.intimate.pojos.realmpojos.Photos;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -129,16 +128,18 @@ public class PhotoDetailedActivity extends AppCompatActivity {
         photo = realm.where(Photos.class).equalTo(Photos.ID, photoid).findFirst();
         byte[] decodedImage = new byte[0];
         if (photo != null) {
-            decodedImage = Base64.decode(photo.getImageBase64(), Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
-            imageView.setImageBitmap(decodedByte);
+//            decodedImage = Base64.decode(photo.getImageBase64(), Base64.DEFAULT);
+//            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.length);
+//            imageView.setImageBitmap(decodedByte);
+            Uri uri = UtilityManager.convertStringToUri(photo.getPhotoNewUriAsString());
+            Picasso.get().load(new File(uri.getPath())).into(imageView);
         }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(PhotoDetailedActivity.this, ViewPhotosActivity.class));
+//        startActivity(new Intent(PhotoDetailedActivity.this, ViewPhotosActivity.class));
         finish();
     }
 
